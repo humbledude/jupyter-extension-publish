@@ -1,36 +1,38 @@
 define([
-  'base/js/namespace'
-], function(
-  Jupyter
-) {
+  'base/js/namespace',
+  'base/js/utils'
+], function(Jupyter, utils) {
   function load_ipython_extension() {
-
     var handler = function () {
-      var xhr = new XMLHttpRequest();
-      xhr.onreadystatechange = function() {
-        if (xhr.readyState == XMLHttpRequest.DONE) {
-          if (xhr.status == 200) {
-            var res = xhr.responseText;
-            alert('success : ' + res);
-          } else {
-            alert('error : ' + xhr.status);
-          }
-        }
-      };
-      xhr.open('GET', '/hello');
-      xhr.send();
+      console.log(Jupyter)
+      Jupyter.notebook.save_checkpoint();
+      var version =  prompt('버전명을 입력하세요')
+
+      utils.ajax({
+        url: '/publish_notebook',
+        type: 'POST',
+        dataType: 'json',
+        data: JSON.stringify({
+          version: version,
+          nb_path: Jupyter.notebook.notebook_path
+        })
+      }).done(function() {
+        console.log('success');
+      }).fail(function(xhr) {
+        console.error(xhr);
+      });
     };
 
     var action = {
-      icon: 'fa-comment-o', // a font-awesome class used on buttons, etc
-      help    : 'Show an alert',
+      icon: 'fa-book', // a font-awesome class used on buttons, etc
+      help    : 'publish notebook',
       help_index : 'zz',
       handler : handler
     };
     var prefix = 'jupyter_extension_publish';
-    var action_name = 'show-alert';
+    var action_name = 'publish_notebook';
 
-    var full_action_name = Jupyter.actions.register(action, action_name, prefix); // returns 'my_extension:show-alert'
+    var full_action_name = Jupyter.actions.register(action, action_name, prefix);
     Jupyter.toolbar.add_buttons_group([full_action_name]);
   }
 
