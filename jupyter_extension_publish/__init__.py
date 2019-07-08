@@ -14,4 +14,14 @@ def _jupyter_nbextension_paths():
         require="jupyter_extension_publish/index")]
 
 def load_jupyter_server_extension(nbapp):
-    nbapp.log.info("publish enabled!")
+    from notebook.utils import url_path_join
+    from .handlers import TestHandler
+
+    url = nbapp.web_app.settings['base_url']
+    nbapp.web_app.add_handlers(
+        r'.*',  # match any host
+        [
+            (url_path_join(url, '/hello'), TestHandler),
+        ]
+    )
+    nbapp.log.info("jupyter_extention_publish enabled!")
