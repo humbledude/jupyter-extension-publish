@@ -2,7 +2,7 @@
 
 for publish notebook to remote storage
 
-v0.1 is tested on minio backend only
+v0.1 is tested on minio backend only + python 2.7
 
 ## install
 ```
