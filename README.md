@@ -4,6 +4,12 @@ for publish notebook to remote storage
 
 v0.2 is tested on minio backend only + python 2.7 + --notebook-dir option
 
+## usage
+click button and write version.
+then find your notebook on s3
+![Screenshot](docs/screenshot.png)
+
+
 ## install
 ```
 pip install jupyter_extension_publish
