@@ -23,4 +23,5 @@ c.PublishSettings.s3_bucket = 'BUCKET_NAME'
 
 ## referenced
 https://github.com/mozilla/jupyter-notebook-gist
+
 https://github.com/nteract/bookstore
