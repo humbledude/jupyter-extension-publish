@@ -5,9 +5,11 @@ define([
   function load_ipython_extension() {
     var handler = function () {
       console.log(Jupyter)
-      Jupyter.notebook.save_checkpoint();
       var version =  prompt('버전명을 입력하세요')
-
+      if (!version) {
+        return;
+      }
+      Jupyter.notebook.save_checkpoint();
       utils.ajax({
         url: '/publish_notebook',
         type: 'POST',
@@ -19,7 +21,9 @@ define([
       }).done(function() {
         console.log('success');
       }).fail(function(xhr) {
-        console.error(xhr);
+        if (xhr.status === 409) {
+          alert('version is exists');
+        }
       });
     };
 

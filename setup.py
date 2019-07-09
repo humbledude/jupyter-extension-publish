@@ -10,4 +10,10 @@ setup(
         author_email='keunhui.park@gmail.com',
         packages=['jupyter_extension_publish'],
         include_package_data=True,
+        install_requires=[
+            'ipython >= 4',
+            'notebook >= 4.3.1',
+            'jupyter',
+            'boto3',
+            ],
         )
