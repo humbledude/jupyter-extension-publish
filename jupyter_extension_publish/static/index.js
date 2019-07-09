@@ -18,9 +18,12 @@ define([
           version: version,
           nb_path: Jupyter.notebook.notebook_path
         })
-      }).done(function() {
-        console.log('success');
+      }).done(function(data) {
+        console.debug(data);
+        alert('publish done : ' + data.uploaded);
+
       }).fail(function(xhr) {
+        console.debug(xhr);
         if (xhr.status === 409) {
           alert('version is exists');
         }

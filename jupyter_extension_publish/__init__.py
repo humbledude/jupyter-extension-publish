@@ -18,21 +18,28 @@ def load_jupyter_server_extension(nbapp):
     from .handlers import TestHandler, PublishS3Handler
     from .config import PublishSettings
 
-    config = PublishSettings(
+    settings = PublishSettings(
         # add access to NotebookApp config, too
         parent=nbapp,
         # for convenient access to frontend settings
         config_manager=nbapp.config_manager,
-    ).config['PublishSettings']
+    )
+    config_s3 = settings.config['PublishSettings']
+    notebook_dir = settings.config['NotebookApp']['notebook_dir']
+    if type(notebook_dir) is not unicode:
+        notebook_dir = ''
+    nbapp.log.info("notebook_dir " + notebook_dir)
+
 
     url = nbapp.web_app.settings['base_url']
     params = dict(
             nbapp=nbapp,
-            access_key=config['s3_access_key_id'],
-            secret_key=config['s3_secret_access_key'],
-            endpoint_url=config['s3_endpoint_url'],
-            region_name=config['s3_region_name'],
-            bucket=config['s3_bucket']
+            access_key=config_s3['s3_access_key_id'],
+            secret_key=config_s3['s3_secret_access_key'],
+            endpoint_url=config_s3['s3_endpoint_url'],
+            region_name=config_s3['s3_region_name'],
+            bucket=config_s3['s3_bucket'],
+            notebook_dir=notebook_dir
             )
     nbapp.web_app.add_handlers(
         r'.*',  # match any host

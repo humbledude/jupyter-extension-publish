@@ -14,13 +14,14 @@ class TestHandler(IPythonHandler):
         self.flush()
 
 class PublishS3Handler(IPythonHandler):
-    def initialize(self, nbapp, access_key, secret_key, endpoint_url, region_name, bucket):
+    def initialize(self, nbapp, access_key, secret_key, endpoint_url, region_name, bucket, notebook_dir):
         self.nbapp = nbapp
         self.access_key = access_key
         self.secret_key = secret_key
         self.endpoint_url = endpoint_url
         self.region_name = region_name
         self.bucket = bucket
+        self.notebook_dir = notebook_dir
 
     def post(self):
         post_data = tornado.escape.json_decode(self.request.body)
@@ -29,16 +30,23 @@ class PublishS3Handler(IPythonHandler):
         version = post_data['version']
 
         self.nbapp.log.info('nb_path: ' + nb_path + ' version: ' + version)
-        new_filename = '/published/{}__{}.{}'.format(nb_path.split('.')[0], version, nb_path.split('.')[1])
-        self.nbapp.log.info('new path :' + new_filename)
+        target_filename = nb_path
+        new_filename = 'published/{}__{}.{}'.format(nb_path.split('.')[0], version, nb_path.split('.')[1])
+        key = new_filename
+
+        if self.notebook_dir:
+            target_filename = '{}/{}'.format(self.notebook_dir, target_filename)
+            new_filename = '{}/{}'.format(self.notebook_dir, new_filename)
+
+        self.nbapp.log.info('new path : ' + new_filename)
 
         # s3 put
         # save checkpoint, duplicate file to published folder, rename file, upload
         try: 
-            shutil.copy(nb_path, new_filename)
+            shutil.copy(target_filename, new_filename)
         except IOError as io_err:
             os.makedirs(os.path.dirname(new_filename))
-            shutil.copy(nb_path, new_filename)
+            shutil.copy(target_filename, new_filename)
 
         s3 = boto3.resource('s3',
                 endpoint_url=self.endpoint_url,
@@ -46,10 +54,6 @@ class PublishS3Handler(IPythonHandler):
                 aws_secret_access_key=self.secret_key,
                 config=Config(signature_version='s3v4'),
                 region_name=self.region_name)
-
-        key = new_filename
-        if key[0] == '/':
-            key = key[1:]
 
         is_key_exists = True
         try:
@@ -62,8 +66,10 @@ class PublishS3Handler(IPythonHandler):
             raise HTTPError(409, 'version is exists')
 
         s3.Bucket(self.bucket).upload_file(new_filename, key)
+        uploaded = 's3://{}/{}'.format(self.bucket, key)
+        self.nbapp.log.info('upload to ' + uploaded)
         ret = {
-                'uploaded' : new_filename
+                'uploaded' : uploaded
                 }
         self.write(json.dumps(ret))
         self.flush()
