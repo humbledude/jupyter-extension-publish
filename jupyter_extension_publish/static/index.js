@@ -1,15 +1,15 @@
 define([
   'base/js/namespace',
-  'base/js/utils'
-], function(Jupyter, utils) {
+  'base/js/utils',
+  'base/js/events'
+], function(Jupyter, utils, events) {
   function load_ipython_extension() {
-    var handler = function () {
-      console.log(Jupyter)
+    function publish() {
+      events.off('notebook_saved.Notebook', publish)
       var version =  prompt('버전명을 입력하세요')
       if (!version) {
         return;
       }
-      Jupyter.notebook.save_checkpoint();
       utils.ajax({
         url: '/publish_notebook',
         type: 'POST',
@@ -28,6 +28,12 @@ define([
           alert('version is exists');
         }
       });
+    }
+
+    var handler = function () {
+      console.log(Jupyter)
+      events.on('notebook_saved.Notebook', publish)
+      Jupyter.notebook.save_checkpoint();
     };
 
     var action = {
