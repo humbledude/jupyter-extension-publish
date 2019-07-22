@@ -2,7 +2,7 @@
 
 for publish notebook to remote storage
 
-v0.2 is tested on minio backend only + python 2.7 + --notebook-dir option
+v0.4 is tested on minio backend only + python (2.7 | 3.6) + --notebook-dir option
 
 ## usage
 click button and write version.

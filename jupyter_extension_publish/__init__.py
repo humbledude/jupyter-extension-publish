@@ -26,7 +26,7 @@ def load_jupyter_server_extension(nbapp):
     )
     config_s3 = settings.config['PublishSettings']
     notebook_dir = settings.config['NotebookApp']['notebook_dir']
-    if type(notebook_dir) is not unicode:
+    if type(notebook_dir) is not str:
         notebook_dir = ''
     nbapp.log.info("notebook_dir " + notebook_dir)
 

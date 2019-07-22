@@ -5,7 +5,7 @@ from distutils.core import setup
 
 setup(
         name='jupyter_extension_publish',
-        version='0.3',
+        version='0.4',
         description='jupyter extension for publish notebook',
         author='Keunhui Park',
         author_email='keunhui.park@gmail.com',
